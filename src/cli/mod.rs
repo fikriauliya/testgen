@@ -1,5 +1,4 @@
-use crate::problemspec::generator::Generator;
-
+use super::io::*;
 use super::problemspec::spec::*;
 use super::testspec::spec::*;
 use clap::{AppSettings, Clap};
@@ -50,17 +49,7 @@ where
 
     match opts.subcmd {
         SubCommand::Generate(g) => {
-            println!("Generating testcases...");
-            let specs = T::test_cases();
-            for spec in specs {
-                let output = spec.input_format().generate();
-                println!("{}", output);
-
-                if let Err(errors) = spec.constraints() {
-                    println!("Constraints errors");
-                    println!("{:?}", errors);
-                }
-            }
+            generate_inputs::<T>(g.output);
         }
         SubCommand::Grade(g) => {
             println!("Grading...");

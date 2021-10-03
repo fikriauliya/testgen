@@ -23,11 +23,11 @@ impl ProblemSpec for Spec {
 
     fn constraints(&self) -> Result<(), Vec<String>> {
         let mut errors = Vec::new();
-        if !self.a >= 0 {
-            errors.push("a >= 0".to_string());
+        if !(self.a > 0) {
+            errors.push("a > 0".to_string());
         }
-        if !self.b >= 0 {
-            errors.push("a >= 0".to_string());
+        if !(self.b > 0) {
+            errors.push("a > 0".to_string());
         }
         if errors.is_empty() {
             return Ok(());
@@ -38,7 +38,11 @@ impl ProblemSpec for Spec {
 }
 impl TestSpec<Spec> for Spec {
     fn test_cases() -> Vec<Spec> {
-        vec![Spec { a: 1, b: 1, sum: 2 }, Spec { a: 2, b: 2, sum: 4 }]
+        vec![
+            Spec { a: 1, b: 1, sum: 2 },
+            Spec { a: 2, b: 2, sum: 4 },
+            Spec { a: 0, b: 2, sum: 2 },
+        ]
     }
 }
 
