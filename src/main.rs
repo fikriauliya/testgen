@@ -9,7 +9,7 @@ struct ProblemSpec {
     hashed: Vec<u64>,
 }
 impl ProblemSpec {
-    fn input_format(self) -> IOFormat {
+    fn input_format(&self) -> IOFormat {
         vec![
             IOElement::Line(vec![LineElement::Scalar(Scalar::UInt(self.t))]),
             IOElement::EmptyLine,
@@ -17,12 +17,27 @@ impl ProblemSpec {
             IOElement::RawLinesBounded(self.s.clone(), self.k),
             IOElement::LinesBounded(
                 vec![
-                    self.n.into_iter().map(Scalar::UInt).collect(),
-                    self.hashed.into_iter().map(Scalar::UInt).collect(),
+                    self.n.iter().map(|&x| Scalar::UInt(x)).collect(),
+                    self.hashed.iter().map(|&x| Scalar::UInt(x)).collect(),
                 ],
                 self.m,
             ),
         ]
+    }
+
+    fn constaints(&self) -> Result<(), Vec<String>> {
+        let mut errors = Vec::new();
+        if !(self.t >= 4) {
+            errors.push("t >= 4".to_string());
+        }
+        if !(self.k >= 1) {
+            errors.push("k >= 1".to_string());
+        }
+        if errors.is_empty() {
+            return Ok(());
+        } else {
+            return Err(errors);
+        }
     }
 }
 fn main() {
@@ -36,4 +51,8 @@ fn main() {
     };
     let output = spec.input_format().generate();
     println!("{}", output);
+
+    if let Err(errors) = spec.constaints() {
+        println!("{:?}", errors);
+    }
 }
