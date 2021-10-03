@@ -41,7 +41,7 @@ struct GradeCommand {
     solution: String,
 }
 
-pub fn run(specs: Vec<impl ProblemSpec>) {
+pub fn run(specs: Vec<Box<dyn ProblemSpec>>) {
     let opts: Opts = Opts::parse();
 
     match opts.subcmd {

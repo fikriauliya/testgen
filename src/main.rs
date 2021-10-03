@@ -48,23 +48,23 @@ impl ProblemSpec for MyProblemSpec {
     }
 }
 fn main() {
-    let specs = vec![
-        MyProblemSpec {
+    let specs: Vec<Box<dyn ProblemSpec>> = vec![
+        Box::new(MyProblemSpec {
             t: 2,
             k: 2,
             m: 2,
             n: vec![1, 2, 3],
             hashed: vec![4, 5, 6],
             s: vec!["a".to_string(), "b".to_string(), "c".to_string()],
-        },
-        MyProblemSpec {
+        }),
+        Box::new(MyProblemSpec {
             t: 3,
             k: 3,
             m: 3,
             n: vec![1, 2, 3],
             hashed: vec![4, 5, 6],
             s: vec!["a".to_string(), "b".to_string(), "c".to_string()],
-        },
+        }),
     ];
     run(specs);
 }
