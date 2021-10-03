@@ -1,3 +1,9 @@
+pub trait ProblemSpec {
+    fn input_format(&self) -> IOFormat;
+    fn output_format(&self) -> IOFormat;
+    fn constraints(&self) -> Result<(), Vec<String>>;
+}
+
 pub type Size = usize;
 
 pub type IOFormat = Vec<IOElement>;

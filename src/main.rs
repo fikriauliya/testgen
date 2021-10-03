@@ -1,6 +1,9 @@
+use std::process::Output;
+
+use testgen::cli::run;
 use testgen::problemspec::{generator::Generator, spec::*};
 
-struct ProblemSpec {
+struct MyProblemSpec {
     t: u64,
     k: usize,
     m: usize,
@@ -8,7 +11,7 @@ struct ProblemSpec {
     s: Vec<String>,
     hashed: Vec<u64>,
 }
-impl ProblemSpec {
+impl ProblemSpec for MyProblemSpec {
     fn input_format(&self) -> IOFormat {
         vec![
             IOElement::Line(vec![LineElement::Scalar(Scalar::UInt(self.t))]),
@@ -25,7 +28,13 @@ impl ProblemSpec {
         ]
     }
 
-    fn constaints(&self) -> Result<(), Vec<String>> {
+    fn output_format(&self) -> IOFormat {
+        vec![IOElement::Line(vec![LineElement::Scalar(Scalar::UInt(
+            self.t,
+        ))])]
+    }
+
+    fn constraints(&self) -> Result<(), Vec<String>> {
         let mut errors = Vec::new();
         if !(self.t >= 4) {
             errors.push("t >= 4".to_string());
@@ -41,7 +50,7 @@ impl ProblemSpec {
     }
 }
 fn main() {
-    let spec = ProblemSpec {
+    let spec = MyProblemSpec {
         t: 2,
         k: 2,
         m: 2,
@@ -49,10 +58,5 @@ fn main() {
         hashed: vec![4, 5, 6],
         s: vec!["a".to_string(), "b".to_string(), "c".to_string()],
     };
-    let output = spec.input_format().generate();
-    println!("{}", output);
-
-    if let Err(errors) = spec.constaints() {
-        println!("{:?}", errors);
-    }
+    run(Box::new(spec));
 }
