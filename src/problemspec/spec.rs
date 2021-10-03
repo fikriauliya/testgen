@@ -7,11 +7,11 @@ pub enum IOElement {
     Line(Vec<LineElement>),
     RawLine(String),
     EmptyLine,
-    RawLinesBounded(Vec<String>, Size),
-    RawLinesUnbounded(Vec<String>),
     LinesBounded(Vec<Vec<Scalar>>, Size),
     LinesUnbounded(Vec<Vec<Scalar>>),
-    // Grid(Vec<Vec<Scalar>>, Size, Size),
+    RawLinesBounded(Vec<String>, Size),
+    RawLinesUnbounded(Vec<String>),
+    Grid(Vec<Vec<Scalar>>, Size, Size),
 }
 
 #[derive(Debug, Clone)]

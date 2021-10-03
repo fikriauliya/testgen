@@ -64,6 +64,24 @@ impl Generator for IOElement {
                 result
             }
             IOElement::RawLinesUnbounded(lines) => lines.join("\n"),
+            IOElement::Grid(grid, height, width) => {
+                let mut result = String::new();
+                for i in 0..*height {
+                    for j in 0..*width {
+                        result.push_str(grid[i][j].generate().as_str());
+                        if j != *width - 1 {
+                            match grid[i][j] {
+                                Scalar::Char(_) => (),
+                                _ => result.push(' '),
+                            }
+                        }
+                    }
+                    if i != *height - 1 {
+                        result.push('\n');
+                    }
+                }
+                result
+            }
         }
     }
 }
@@ -193,6 +211,36 @@ mod tests {
         let line = IOElement::RawLinesUnbounded(lines);
         let result = line.generate();
         assert_eq!(result, "Hello World\nHello World\nHello World");
+    }
+
+    #[test]
+    fn test_generate_grid() {
+        let grid = vec![
+            vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)],
+            vec![Scalar::Int(4), Scalar::Int(5), Scalar::Int(6)],
+        ];
+        let result = IOElement::Grid(grid, 2, 3).generate();
+        assert_eq!(result, "1 2 3\n4 5 6");
+
+        let grid = vec![
+            vec![Scalar::Char('a'), Scalar::Char('b'), Scalar::Char('c')],
+            vec![Scalar::Char('d'), Scalar::Char('e'), Scalar::Char('f')],
+        ];
+        let result = IOElement::Grid(grid, 2, 3).generate();
+        assert_eq!(result, "abc\ndef");
+
+        let grid = vec![
+            vec![
+                Scalar::String("Hello".to_string()),
+                Scalar::String("World".to_string()),
+            ],
+            vec![
+                Scalar::String("Hi".to_string()),
+                Scalar::String("All".to_string()),
+            ],
+        ];
+        let result = IOElement::Grid(grid, 2, 2).generate();
+        assert_eq!(result, "Hello World\nHi All");
     }
 
     #[test]
