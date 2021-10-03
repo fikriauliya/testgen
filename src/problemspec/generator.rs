@@ -99,3 +99,115 @@ impl Generator for LineElement {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_line() {
+        let line = IOElement::Line(vec![
+            LineElement::Scalar(Scalar::Int(1)),
+            LineElement::BoundedVec(vec![Scalar::Int(2), Scalar::Int(3)], 2),
+            LineElement::UnboundedVec(vec![Scalar::Int(4), Scalar::Int(5)]),
+            LineElement::Scalar(Scalar::Int(6)),
+        ]);
+        let result = line.generate();
+        assert_eq!(result, "1 2 3 4 5 6");
+    }
+
+    #[test]
+    fn test_generate_lines_bounded() {
+        let a = vec![1, 2, 3]
+            .into_iter()
+            .map(Scalar::Int)
+            .collect::<Vec<_>>();
+        let b = vec![4, 5, 6]
+            .into_iter()
+            .map(Scalar::Int)
+            .collect::<Vec<_>>();
+        let lines = vec![a, b];
+        let result = IOElement::LinesBounded(lines.clone(), 3).generate();
+        assert_eq!(result, "1 4\n2 5\n3 6");
+
+        let result = IOElement::LinesBounded(lines.clone(), 1).generate();
+        assert_eq!(result, "1 4");
+    }
+
+    #[test]
+    fn test_generate_lines_unbounded() {
+        let a = vec![1, 2, 3]
+            .into_iter()
+            .map(Scalar::Int)
+            .collect::<Vec<_>>();
+        let b = vec![4, 5, 6]
+            .into_iter()
+            .map(Scalar::Int)
+            .collect::<Vec<_>>();
+        let lines = vec![a, b];
+        let result = IOElement::LinesUnbounded(lines.clone()).generate();
+        assert_eq!(result, "1 4\n2 5\n3 6");
+    }
+
+    #[test]
+    fn test_generate_raw_line() {
+        let line = IOElement::RawLine("Hello World".to_string());
+        let result = line.generate();
+        assert_eq!(result, "Hello World");
+    }
+
+    #[test]
+    fn test_generate_empty_line() {
+        let line = IOElement::EmptyLine;
+        let result = line.generate();
+        assert_eq!(result, "");
+    }
+
+    #[test]
+    fn test_generate_raw_lines_bounded() {
+        let lines = vec![
+            "Hello World".to_string(),
+            "Hello World".to_string(),
+            "Hello World".to_string(),
+        ];
+        let line = IOElement::RawLinesBounded(lines.clone(), 3);
+        let result = line.generate();
+        assert_eq!(result, "Hello World\nHello World\nHello World");
+
+        let line = IOElement::RawLinesBounded(lines.clone(), 2);
+        let result = line.generate();
+        assert_eq!(result, "Hello World\nHello World");
+    }
+
+    #[test]
+    fn test_generate_raw_lines_unbounded() {
+        let lines = vec![
+            "Hello World".to_string(),
+            "Hello World".to_string(),
+            "Hello World".to_string(),
+        ];
+        let line = IOElement::RawLinesUnbounded(lines);
+        let result = line.generate();
+        assert_eq!(result, "Hello World\nHello World\nHello World");
+    }
+
+    #[test]
+    fn test_generate_scalar() {
+        let scalar = Scalar::Int(42);
+        assert_eq!(scalar.generate(), "42");
+        let scalar = Scalar::Float(3.14);
+        assert_eq!(scalar.generate(), "3.14");
+    }
+
+    #[test]
+    fn test_generate_line_element() {
+        let element = LineElement::Scalar(Scalar::Int(1));
+        assert_eq!(element.generate(), "1");
+        let element = LineElement::BoundedVec(vec![Scalar::Int(1), Scalar::Int(2)], 2);
+        assert_eq!(element.generate(), "1 2");
+        let element = LineElement::BoundedVec(vec![Scalar::Int(1), Scalar::Int(2)], 1);
+        assert_eq!(element.generate(), "1");
+        let element = LineElement::UnboundedVec(vec![Scalar::Int(1), Scalar::Int(2)]);
+        assert_eq!(element.generate(), "1 2");
+    }
+}

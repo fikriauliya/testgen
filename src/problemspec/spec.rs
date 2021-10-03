@@ -2,6 +2,7 @@ pub type Size = usize;
 
 pub type IOFormat = Vec<IOElement>;
 
+#[derive(Debug, Clone)]
 pub enum IOElement {
     Line(Vec<LineElement>),
     RawLine(String),
@@ -13,11 +14,13 @@ pub enum IOElement {
     // Grid(Vec<Vec<Scalar>>, Size, Size),
 }
 
+#[derive(Debug, Clone)]
 pub enum Scalar {
     Int(usize),
     Float(f64),
 }
 
+#[derive(Debug, Clone)]
 pub enum LineElement {
     Scalar(Scalar),
     BoundedVec(Vec<Scalar>, Size),
