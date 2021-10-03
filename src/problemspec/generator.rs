@@ -53,16 +53,12 @@ impl Generator for IOElement {
             }
             IOElement::RawLine(line) => line.to_string(),
             IOElement::EmptyLine => String::new(),
-            IOElement::RawLinesBounded(lines, size) => {
-                let mut result = String::new();
-                for i in 0..*size {
-                    result.push_str(lines[i].as_str());
-                    if i != *size - 1 {
-                        result.push('\n');
-                    }
-                }
-                result
-            }
+            IOElement::RawLinesBounded(lines, size) => lines
+                .into_iter()
+                .take(*size)
+                .map(|line| line.to_string())
+                .collect::<Vec<String>>()
+                .join("\n"),
             IOElement::RawLinesUnbounded(lines) => lines.join("\n"),
             IOElement::Grid(grid, height, width) => {
                 let mut result = String::new();
@@ -103,16 +99,12 @@ impl Generator for LineElement {
     fn generate(&self) -> String {
         match self {
             LineElement::Scalar(s) => s.generate(),
-            LineElement::BoundedVec(v, size) => {
-                let mut result = String::new();
-                for i in 0..*size {
-                    result.push_str(&v[i].generate());
-                    if i != *size - 1 {
-                        result.push_str(" ");
-                    }
-                }
-                result
-            }
+            LineElement::BoundedVec(v, size) => v
+                .iter()
+                .map(|e| e.generate())
+                .take(*size)
+                .collect::<Vec<String>>()
+                .join(" "),
             LineElement::UnboundedVec(v) => v
                 .iter()
                 .map(|s| s.generate())
