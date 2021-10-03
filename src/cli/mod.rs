@@ -1,6 +1,7 @@
 use crate::problemspec::generator::Generator;
 
 use super::problemspec::spec::*;
+use super::testspec::spec::*;
 use clap::{AppSettings, Clap};
 
 #[derive(Clap)]
@@ -41,15 +42,16 @@ struct GradeCommand {
     solution: String,
 }
 
-pub fn run<T>(specs: Vec<T>)
+pub fn run<T>()
 where
-    T: ProblemSpec,
+    T: ProblemSpec + TestSpec<T>,
 {
     let opts: Opts = Opts::parse();
 
     match opts.subcmd {
         SubCommand::Generate(g) => {
             println!("Generating testcases...");
+            let specs = T::test_cases();
             for spec in specs {
                 let output = spec.input_format().generate();
                 println!("{}", output);

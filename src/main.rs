@@ -1,7 +1,8 @@
 use testgen::cli::run;
 use testgen::problemspec::spec::*;
+use testgen::testspec::spec::*;
 
-struct MyProblemSpec {
+struct Spec {
     t: u64,
     k: usize,
     m: usize,
@@ -9,7 +10,7 @@ struct MyProblemSpec {
     s: Vec<String>,
     hashed: Vec<u64>,
 }
-impl ProblemSpec for MyProblemSpec {
+impl ProblemSpec for Spec {
     fn input_format(&self) -> IOFormat {
         vec![
             IOElement::Line(vec![LineElement::Scalar(Scalar::UInt(self.t))]),
@@ -47,24 +48,29 @@ impl ProblemSpec for MyProblemSpec {
         }
     }
 }
+impl TestSpec<Spec> for Spec {
+    fn test_cases() -> Vec<Spec> {
+        vec![
+            Spec {
+                t: 2,
+                k: 2,
+                m: 2,
+                n: vec![1, 2, 3],
+                hashed: vec![4, 5, 6],
+                s: vec!["a".to_string(), "b".to_string(), "c".to_string()],
+            },
+            Spec {
+                t: 3,
+                k: 3,
+                m: 3,
+                n: vec![1, 2, 3],
+                hashed: vec![4, 5, 6],
+                s: vec!["a".to_string(), "b".to_string(), "c".to_string()],
+            },
+        ]
+    }
+}
+
 fn main() {
-    let specs = vec![
-        MyProblemSpec {
-            t: 2,
-            k: 2,
-            m: 2,
-            n: vec![1, 2, 3],
-            hashed: vec![4, 5, 6],
-            s: vec!["a".to_string(), "b".to_string(), "c".to_string()],
-        },
-        MyProblemSpec {
-            t: 3,
-            k: 3,
-            m: 3,
-            n: vec![1, 2, 3],
-            hashed: vec![4, 5, 6],
-            s: vec!["a".to_string(), "b".to_string(), "c".to_string()],
-        },
-    ];
-    run(specs);
+    run::<Spec>();
 }
