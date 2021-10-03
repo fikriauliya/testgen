@@ -41,18 +41,20 @@ struct GradeCommand {
     solution: String,
 }
 
-pub fn run(spec: Box<dyn ProblemSpec>) {
+pub fn run(specs: Vec<impl ProblemSpec>) {
     let opts: Opts = Opts::parse();
 
     match opts.subcmd {
         SubCommand::Generate(g) => {
             println!("Generating testcases...");
-            let output = spec.input_format().generate();
-            println!("{}", output);
+            for spec in specs {
+                let output = spec.input_format().generate();
+                println!("{}", output);
 
-            if let Err(errors) = spec.constraints() {
-                println!("Constraints errors");
-                println!("{:?}", errors);
+                if let Err(errors) = spec.constraints() {
+                    println!("Constraints errors");
+                    println!("{:?}", errors);
+                }
             }
         }
         SubCommand::Grade(g) => {
