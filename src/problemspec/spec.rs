@@ -16,8 +16,12 @@ pub enum IOElement {
 
 #[derive(Debug, Clone)]
 pub enum Scalar {
-    Int(usize),
+    UInt(u64),
     Float(f64),
+    String(String),
+    Char(char),
+    Int(i64),
+    Bool(bool),
 }
 
 #[derive(Debug, Clone)]

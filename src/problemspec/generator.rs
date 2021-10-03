@@ -71,8 +71,12 @@ impl Generator for IOElement {
 impl Generator for Scalar {
     fn generate(&self) -> String {
         match self {
+            Scalar::UInt(u) => u.to_string(),
             Scalar::Int(i) => i.to_string(),
             Scalar::Float(f) => f.to_string(),
+            Scalar::String(s) => s.to_string(),
+            Scalar::Char(c) => c.to_string(),
+            Scalar::Bool(b) => b.to_string(),
         }
     }
 }
@@ -193,10 +197,23 @@ mod tests {
 
     #[test]
     fn test_generate_scalar() {
-        let scalar = Scalar::Int(42);
+        let scalar = Scalar::UInt(42);
         assert_eq!(scalar.generate(), "42");
+
+        let scalar = Scalar::Int(-42);
+        assert_eq!(scalar.generate(), "-42");
+
         let scalar = Scalar::Float(3.14);
         assert_eq!(scalar.generate(), "3.14");
+
+        let scalar = Scalar::String("Hello World".to_string());
+        assert_eq!(scalar.generate(), "Hello World");
+
+        let scalar = Scalar::Char('a');
+        assert_eq!(scalar.generate(), "a");
+
+        let scalar = Scalar::Bool(true);
+        assert_eq!(scalar.generate(), "true");
     }
 
     #[test]
