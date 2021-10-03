@@ -41,7 +41,10 @@ struct GradeCommand {
     solution: String,
 }
 
-pub fn run(specs: Vec<Box<dyn ProblemSpec>>) {
+pub fn run<T>(specs: Vec<T>)
+where
+    T: ProblemSpec,
+{
     let opts: Opts = Opts::parse();
 
     match opts.subcmd {
