@@ -49,7 +49,7 @@ where
 
     match opts.subcmd {
         SubCommand::Generate(g) => {
-            generate_inputs::<T>(g.output);
+            generate_inputs_outputs::<T>(g.output, g.solution, g.seed);
         }
         SubCommand::Grade(g) => {
             println!("Grading...");
