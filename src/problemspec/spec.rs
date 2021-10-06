@@ -18,7 +18,7 @@ pub trait ProblemSpec {
 pub type Size = usize;
 
 pub struct MultipleTestcaseConfig {
-    pub constraints: fn(usize) -> Result<(), Vec<String>>,
+    pub constraints: fn(usize) -> Result<(), ConstraintsError>,
     pub output_prefix: Option<String>,
 }
 

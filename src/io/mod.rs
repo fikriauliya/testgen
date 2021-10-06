@@ -15,6 +15,8 @@ use super::testspec::spec::*;
 pub enum GenerateInputOutputError {
     #[error("Constraints error")]
     ConstraintsError(#[from] ConstraintsError),
+    #[error("Invalid format")]
+    FormatError(String),
 }
 
 fn check_constraints<T>(spec: &T, testcase_id: usize) -> Result<(), ConstraintsError>
@@ -61,7 +63,8 @@ where
     match T::multiple_test_case_config() {
         Some(multi_test_config) => {
             let mut inputs = String::new();
-            inputs.push_str(format!("{}\n", specs.len()).as_str());
+            let t = specs.len();
+            inputs.push_str(format!("{}\n", t).as_str());
             for (i, spec) in specs.iter().enumerate() {
                 check_constraints(spec, i + 1)?;
                 let input = spec.input_format().generate();
@@ -70,13 +73,29 @@ where
                     inputs.push_str("\n");
                 }
             }
-            //TODO check multiple_test_case_config
+            let constraints = multi_test_config.constraints;
+            if let Err(constraints_error) = constraints(t) {
+                println!("Failed constraints");
+                return Err(GenerateInputOutputError::ConstraintsError(
+                    constraints_error,
+                ));
+            }
 
             let input_path = base_folder.join(format!("{}.in", 1));
             write_file(&inputs, &input_path);
 
             if let Some(solution_command) = &solution_command {
                 let output = executor::execute(&solution_command, &inputs);
+
+                if let Some(output_prefix) = multi_test_config.output_prefix {
+                    if !output.starts_with(&output_prefix) {
+                        println!("Invalid prefix");
+                        return Err(GenerateInputOutputError::FormatError(format!(
+                            "Output prefix is not correct: {}",
+                            output_prefix
+                        )));
+                    }
+                }
 
                 let output_path = base_folder.join(format!("{}.out", 1));
                 write_file(&output, &output_path);
