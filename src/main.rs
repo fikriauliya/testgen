@@ -21,6 +21,23 @@ impl ProblemSpec for Spec {
         ))])]
     }
 
+    fn multiple_test_case_config() -> Option<MultipleTestcaseConfig> {
+        Some(MultipleTestcaseConfig {
+            constraints: |t| {
+                let mut errors = Vec::new();
+                if !(t < 10) {
+                    errors.push("t < 10".to_string());
+                }
+                if errors.is_empty() {
+                    return Ok(());
+                } else {
+                    return Err(errors);
+                }
+            },
+            output_prefix: Some("Case #{d}: ".to_string()),
+        })
+    }
+
     fn constraints(&self) -> Result<(), Vec<String>> {
         let mut errors = Vec::new();
         if !(self.a > 0) {
@@ -41,7 +58,7 @@ impl TestSpec<Spec> for Spec {
         vec![
             Spec { a: 1, b: 1, sum: 2 },
             Spec { a: 2, b: 2, sum: 4 },
-            Spec { a: 0, b: 2, sum: 2 },
+            // Spec { a: 0, b: 2, sum: 2 },
         ]
     }
 }

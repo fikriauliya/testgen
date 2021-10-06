@@ -1,12 +1,36 @@
-use std::fs::{create_dir, remove_dir, remove_dir_all, File};
+mod executor;
+
+use std::fs::{create_dir, remove_dir_all, File};
 use std::io::Write;
-use std::path::Path;
-use std::process::{Command, Stdio};
+use std::path::{Path, PathBuf};
 
 use crate::problemspec::generator::Generator;
 
 use super::problemspec::spec::*;
 use super::testspec::spec::*;
+
+fn check_constraints<T>(spec: &T, testcase_id: usize) -> bool
+where
+    T: ProblemSpec,
+{
+    if let Err(errors) = spec.constraints() {
+        println!("  {}: FAILED", testcase_id);
+        println!("    Reasons:");
+        //TODO: print the variable values
+        for error in errors {
+            println!("    * Expected: {}", error);
+        }
+        return false;
+    } else {
+        println!("  {}: OK", testcase_id);
+    }
+    return true;
+}
+
+fn write_file(content: &str, path: &PathBuf) {
+    let mut input_file = File::create(path).unwrap();
+    input_file.write_all(content.as_bytes()).unwrap();
+}
 
 pub fn generate_inputs_outputs<T>(
     base_folder: String,
@@ -24,44 +48,51 @@ pub fn generate_inputs_outputs<T>(
         remove_dir_all(&base_folder).expect("Failed to remove folder");
     }
     create_dir(&base_folder).expect("Failed to create output folder");
-    for (i, spec) in specs.iter().enumerate() {
-        if let Err(errors) = spec.constraints() {
-            println!("  {}: FAILED", i + 1);
-            println!("    Reasons:");
-            //TODO: print the variable values
-            for error in errors {
-                println!("    * Expected: {}", error);
+
+    match T::multiple_test_case_config() {
+        Some(_) => {
+            let mut inputs = String::new();
+            inputs.push_str(format!("{}\n", specs.len()).as_str());
+            for (i, spec) in specs.iter().enumerate() {
+                if check_constraints(spec, i + 1) {
+                    let input = spec.input_format().generate();
+                    inputs.push_str(&input);
+                    if i != specs.len() - 1 {
+                        inputs.push_str("\n");
+                    }
+                } else {
+                    //return
+                }
             }
-        } else {
-            let input = spec.input_format().generate();
-            let input_path = base_folder.join(format!("{}.in", i + 1));
-            let mut input_file = File::create(input_path).unwrap();
-            input_file.write_all(input.as_bytes()).unwrap();
+            //TODO check multiple_test_case_config
+
+            let input_path = base_folder.join(format!("{}.in", 1));
+            write_file(&inputs, &input_path);
 
             if let Some(solution_command) = &solution_command {
-                let output_path = base_folder.join(format!("{}.out", i + 1));
-                let mut output_file = File::create(output_path).unwrap();
+                let output = executor::execute(&solution_command, &inputs);
 
-                let args = shlex::split(solution_command).unwrap();
-                let mut cmd = Command::new(&args[0]);
-                let mut child = cmd
-                    .stdin(Stdio::piped())
-                    .stdout(Stdio::piped())
-                    .args(args.iter().skip(1))
-                    .spawn()
-                    .expect("Failed to execute solution");
-                child
-                    .stdin
-                    .as_mut()
-                    .unwrap()
-                    .write_all(input.as_bytes())
-                    .unwrap();
-
-                let output = child.wait_with_output().unwrap();
-                output_file.write_all(output.stdout.as_slice()).unwrap();
+                let output_path = base_folder.join(format!("{}.out", 1));
+                write_file(&output, &output_path);
             }
+        }
+        None => {
+            for (i, spec) in specs.iter().enumerate() {
+                if check_constraints(spec, i + 1) {
+                    let input = spec.input_format().generate();
+                    let input_path = base_folder.join(format!("{}.in", i + 1));
+                    write_file(&input, &input_path);
 
-            println!("  {}: OK", i + 1);
+                    if let Some(solution_command) = &solution_command {
+                        let output = executor::execute(&solution_command, &input);
+
+                        let output_path = base_folder.join(format!("{}.out", i + 1));
+                        write_file(&output, &output_path);
+                    }
+                } else {
+                    //return
+                }
+            }
         }
     }
 }

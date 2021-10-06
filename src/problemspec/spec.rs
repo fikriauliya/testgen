@@ -2,9 +2,17 @@ pub trait ProblemSpec {
     fn input_format(&self) -> IOFormat;
     fn output_format(&self) -> IOFormat;
     fn constraints(&self) -> Result<(), Vec<String>>;
+    fn multiple_test_case_config() -> Option<MultipleTestcaseConfig> {
+        None
+    }
 }
 
 pub type Size = usize;
+
+pub struct MultipleTestcaseConfig {
+    pub constraints: fn(usize) -> Result<(), Vec<String>>,
+    pub output_prefix: Option<String>,
+}
 
 pub type IOFormat = Vec<IOElement>;
 
