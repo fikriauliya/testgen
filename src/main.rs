@@ -25,7 +25,7 @@ impl ProblemSpec for Spec {
         Some(MultipleTestcaseConfig {
             constraints: |t| {
                 let mut errors = Vec::new();
-                if !(t < 1) {
+                if !(t < 10) {
                     errors.push("t < 10".to_string());
                 }
                 if errors.is_empty() {
@@ -34,7 +34,7 @@ impl ProblemSpec for Spec {
                     return Err(ConstraintsError { messages: errors });
                 }
             },
-            output_prefix: Some("Case #{d}: ".to_string()),
+            output_prefix: Some("Case #".to_string()),
         })
     }
 

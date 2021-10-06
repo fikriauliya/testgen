@@ -49,7 +49,29 @@ where
 
     match opts.subcmd {
         SubCommand::Generate(g) => {
-            generate_inputs_outputs::<T>(g.output, g.solution, g.seed);
+            println!("Generating test cases...");
+            println!("[ OFFICIAL TEST CASES ]");
+            match generate_inputs_outputs::<T>(g.output, g.solution, g.seed) {
+                Ok(_) => {
+                    println!("Done");
+                }
+                Err(err) => {
+                    println!("  FAILED");
+                    match err {
+                        GenerateInputOutputError::ConstraintsError(errors) => {
+                            for error in &errors.messages {
+                                println!("    * Expected: {}", error);
+                            }
+                        }
+                        GenerateInputOutputError::OutputFormatError(error) => {
+                            println!("    * Formatting error: {}", error);
+                        }
+                        GenerateInputOutputError::IOError(error) => {
+                            println!("    * IO error: {}", error);
+                        }
+                    }
+                }
+            }
         }
         SubCommand::Grade(g) => {
             println!("Grading...");
