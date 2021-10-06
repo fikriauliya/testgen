@@ -1,7 +1,5 @@
 use std::fs::{create_dir, remove_dir, remove_dir_all, File};
-use std::io::prelude::*;
 use std::io::Write;
-use std::ops::Shl;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
