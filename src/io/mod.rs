@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 mod executor;
 
 use std::fs::{create_dir, remove_dir_all, File};
@@ -9,7 +11,13 @@ use crate::problemspec::generator::Generator;
 use super::problemspec::spec::*;
 use super::testspec::spec::*;
 
-fn check_constraints<T>(spec: &T, testcase_id: usize) -> bool
+#[derive(Debug, Error)]
+pub enum GenerateInputOutputError {
+    #[error("Constraints error")]
+    ConstraintsError(#[from] ConstraintsError),
+}
+
+fn check_constraints<T>(spec: &T, testcase_id: usize) -> Result<(), ConstraintsError>
 where
     T: ProblemSpec,
 {
@@ -17,14 +25,14 @@ where
         println!("  {}: FAILED", testcase_id);
         println!("    Reasons:");
         //TODO: print the variable values
-        for error in errors {
+        for error in &errors.messages {
             println!("    * Expected: {}", error);
         }
-        return false;
+        Err(errors)
     } else {
         println!("  {}: OK", testcase_id);
+        Ok(())
     }
-    return true;
 }
 
 fn write_file(content: &str, path: &PathBuf) {
@@ -36,7 +44,8 @@ pub fn generate_inputs_outputs<T>(
     base_folder: String,
     solution_command: Option<String>,
     seed: usize,
-) where
+) -> Result<(), GenerateInputOutputError>
+where
     T: ProblemSpec + TestSpec<T>,
 {
     let specs = T::test_cases();
@@ -50,18 +59,15 @@ pub fn generate_inputs_outputs<T>(
     create_dir(&base_folder).expect("Failed to create output folder");
 
     match T::multiple_test_case_config() {
-        Some(_) => {
+        Some(multi_test_config) => {
             let mut inputs = String::new();
             inputs.push_str(format!("{}\n", specs.len()).as_str());
             for (i, spec) in specs.iter().enumerate() {
-                if check_constraints(spec, i + 1) {
-                    let input = spec.input_format().generate();
-                    inputs.push_str(&input);
-                    if i != specs.len() - 1 {
-                        inputs.push_str("\n");
-                    }
-                } else {
-                    //return
+                check_constraints(spec, i + 1)?;
+                let input = spec.input_format().generate();
+                inputs.push_str(&input);
+                if i != specs.len() - 1 {
+                    inputs.push_str("\n");
                 }
             }
             //TODO check multiple_test_case_config
@@ -75,24 +81,24 @@ pub fn generate_inputs_outputs<T>(
                 let output_path = base_folder.join(format!("{}.out", 1));
                 write_file(&output, &output_path);
             }
+            Ok(())
         }
         None => {
             for (i, spec) in specs.iter().enumerate() {
-                if check_constraints(spec, i + 1) {
-                    let input = spec.input_format().generate();
-                    let input_path = base_folder.join(format!("{}.in", i + 1));
-                    write_file(&input, &input_path);
+                check_constraints(spec, i + 1)?;
 
-                    if let Some(solution_command) = &solution_command {
-                        let output = executor::execute(&solution_command, &input);
+                let input = spec.input_format().generate();
+                let input_path = base_folder.join(format!("{}.in", i + 1));
+                write_file(&input, &input_path);
 
-                        let output_path = base_folder.join(format!("{}.out", i + 1));
-                        write_file(&output, &output_path);
-                    }
-                } else {
-                    //return
+                if let Some(solution_command) = &solution_command {
+                    let output = executor::execute(&solution_command, &input);
+
+                    let output_path = base_folder.join(format!("{}.out", i + 1));
+                    write_file(&output, &output_path);
                 }
             }
+            Ok(())
         }
     }
 }

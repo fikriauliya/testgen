@@ -1,7 +1,15 @@
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+#[error("Expected: {messages:?}")]
+pub struct ConstraintsError {
+    pub messages: Vec<String>,
+}
+
 pub trait ProblemSpec {
     fn input_format(&self) -> IOFormat;
     fn output_format(&self) -> IOFormat;
-    fn constraints(&self) -> Result<(), Vec<String>>;
+    fn constraints(&self) -> Result<(), ConstraintsError>;
     fn multiple_test_case_config() -> Option<MultipleTestcaseConfig> {
         None
     }

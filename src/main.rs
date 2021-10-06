@@ -38,18 +38,18 @@ impl ProblemSpec for Spec {
         })
     }
 
-    fn constraints(&self) -> Result<(), Vec<String>> {
+    fn constraints(&self) -> Result<(), ConstraintsError> {
         let mut errors = Vec::new();
         if !(self.a > 0) {
             errors.push("a > 0".to_string());
         }
         if !(self.b > 0) {
-            errors.push("a > 0".to_string());
+            errors.push("b > 0".to_string());
         }
         if errors.is_empty() {
-            return Ok(());
+            Ok(())
         } else {
-            return Err(errors);
+            Err(ConstraintsError { messages: errors })
         }
     }
 }
