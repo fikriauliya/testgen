@@ -70,18 +70,5 @@ macro_rules! cons {
                 Err(ConstraintsError { messages: errors })
             }
         }
-
-        // let mut errors = Vec::new();
-        // if !(self.a > 0) {
-        //     errors.push("a > 0".to_string());
-        // }
-        // if !(self.b > 0) {
-        //     errors.push("b > 0".to_string());
-        // }
-        // if errors.is_empty() {
-        //     Ok(())
-        // } else {
-        //     Err(ConstraintsError { messages: errors })
-        // }
     };
 }
