@@ -1,3 +1,4 @@
+use rand::SeedableRng;
 use thiserror::Error;
 
 mod executor;
@@ -7,6 +8,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use crate::problemspec::generator::Generator;
+use crate::testspec;
 
 use super::problemspec::spec::*;
 use super::testspec::spec::*;
@@ -54,12 +56,13 @@ fn check_output(
 pub fn generate_inputs_outputs<T>(
     base_folder: String,
     solution_command: Option<String>,
-    seed: usize,
+    seed: u64,
 ) -> Result<(), GenerateInputOutputError>
 where
     T: ProblemSpec + TestSpec<T>,
 {
-    let specs = T::test_cases();
+    let mut random = Random::new(seed);
+    let specs = T::test_cases(&mut random);
     let base_folder = prepare_folder(&base_folder)?;
 
     match T::multiple_test_case_config() {

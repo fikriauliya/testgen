@@ -29,7 +29,7 @@ struct GenerateCommand {
     solution: Option<String>,
 
     #[clap(long, default_value = "0")]
-    seed: usize,
+    seed: u64,
 }
 
 #[derive(Clap)]
