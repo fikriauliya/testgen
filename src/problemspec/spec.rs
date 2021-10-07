@@ -53,3 +53,35 @@ pub enum LineElement {
     BoundedVec(Vec<Scalar>, Size),
     UnboundedVec(Vec<Scalar>),
 }
+
+#[macro_export]
+macro_rules! cons {
+    ($($x:expr),*) => {
+        {
+            let mut errors = Vec::new();
+            $(
+                if !($x) {
+                    errors.push(String::from(stringify!($x)));
+                }
+            )*
+            if errors.is_empty() {
+                Ok(())
+            } else {
+                Err(ConstraintsError { messages: errors })
+            }
+        }
+
+        // let mut errors = Vec::new();
+        // if !(self.a > 0) {
+        //     errors.push("a > 0".to_string());
+        // }
+        // if !(self.b > 0) {
+        //     errors.push("b > 0".to_string());
+        // }
+        // if errors.is_empty() {
+        //     Ok(())
+        // } else {
+        //     Err(ConstraintsError { messages: errors })
+        // }
+    };
+}

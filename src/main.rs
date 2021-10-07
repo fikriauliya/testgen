@@ -1,4 +1,5 @@
 use testgen::cli::run;
+use testgen::cons;
 use testgen::problemspec::spec::*;
 use testgen::testspec::spec::*;
 
@@ -23,34 +24,13 @@ impl ProblemSpec for Spec {
 
     fn multiple_test_case_config() -> Option<MultipleTestcaseConfig> {
         Some(MultipleTestcaseConfig {
-            constraints: |t| {
-                let mut errors = Vec::new();
-                if !(t < 10) {
-                    errors.push("t < 10".to_string());
-                }
-                if errors.is_empty() {
-                    return Ok(());
-                } else {
-                    return Err(ConstraintsError { messages: errors });
-                }
-            },
+            constraints: |t| cons!(t < 10),
             output_prefix: Some("Case #".to_string()),
         })
     }
 
     fn constraints(&self) -> Result<(), ConstraintsError> {
-        let mut errors = Vec::new();
-        if !(self.a > 0) {
-            errors.push("a > 0".to_string());
-        }
-        if !(self.b > 0) {
-            errors.push("b > 0".to_string());
-        }
-        if errors.is_empty() {
-            Ok(())
-        } else {
-            Err(ConstraintsError { messages: errors })
-        }
+        cons!(self.a > 0, self.b > 0)
     }
 }
 impl TestSpec<Spec> for Spec {
