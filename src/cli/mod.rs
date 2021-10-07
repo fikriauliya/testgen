@@ -73,8 +73,8 @@ where
                 }
             }
         }
-        SubCommand::Grade(g) => {
-            println!("Grading...");
+        SubCommand::Grade(_) => {
+            todo!()
         }
     }
 }

@@ -1,8 +1,5 @@
 use rand::{
-    distributions::{
-        uniform::{SampleRange, SampleUniform},
-        Standard,
-    },
+    distributions::{uniform::SampleUniform, Standard},
     prelude::Distribution,
     Rng, SeedableRng,
 };

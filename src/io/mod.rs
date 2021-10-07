@@ -1,4 +1,3 @@
-use rand::SeedableRng;
 use thiserror::Error;
 
 mod executor;
@@ -8,7 +7,6 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use crate::problemspec::generator::Generator;
-use crate::testspec;
 
 use super::problemspec::spec::*;
 use super::testspec::spec::*;
