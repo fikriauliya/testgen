@@ -116,6 +116,8 @@ impl Generator for LineElement {
 
 #[cfg(test)]
 mod tests {
+    use crate::{EMPTY_LINE, LINE, LINES, LS, LV, RAW_LINE, RAW_LINES, V};
+
     use super::*;
 
     #[test]

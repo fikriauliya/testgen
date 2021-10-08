@@ -49,7 +49,6 @@ macro_rules! LINE {
         }
     };
 }
-pub(crate) use LINE;
 
 #[macro_export]
 macro_rules! RAW_LINE {
@@ -57,7 +56,6 @@ macro_rules! RAW_LINE {
         IOElement::RawLine($x.to_string())
     };
 }
-pub(crate) use RAW_LINE;
 
 #[macro_export]
 macro_rules! EMPTY_LINE {
@@ -65,7 +63,6 @@ macro_rules! EMPTY_LINE {
         IOElement::EmptyLine
     };
 }
-pub(crate) use EMPTY_LINE;
 
 #[macro_export]
 macro_rules! LINES {
@@ -73,7 +70,6 @@ macro_rules! LINES {
         IOElement::LinesUnbounded(vec![$($x), +])
     };
 }
-pub(crate) use LINES;
 
 #[macro_export]
 macro_rules! RAW_LINES {
@@ -81,7 +77,6 @@ macro_rules! RAW_LINES {
         IOElement::RawLinesUnbounded(vec![$(String::from($x)), +])
     };
 }
-pub(crate) use RAW_LINES;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Scalar {
@@ -108,7 +103,6 @@ macro_rules! LS {
         LineElement::Scalar(result)
     }};
 }
-pub(crate) use LS;
 
 #[macro_export]
 macro_rules! LV {
@@ -116,7 +110,6 @@ macro_rules! LV {
         LineElement::UnboundedVec(V![$($x), +])
     }};
 }
-pub(crate) use LV;
 
 #[macro_export]
 macro_rules! V {
@@ -125,7 +118,6 @@ macro_rules! V {
         res
     }}
 }
-pub(crate) use V;
 
 #[macro_export]
 macro_rules! CONS {
