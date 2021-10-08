@@ -123,11 +123,11 @@ mod tests {
         let line = LINE!(
             LS!(1),
             LineElement::BoundedVec(vec![Scalar::Int(2), Scalar::Int(3)], 2),
-            LV!(4, 5),
-            LS!(6),
+            LV![4, 5],
+            LS!(6.5),
         );
         let result = line.generate();
-        assert_eq!(result, "1 2 3 4 5 6");
+        assert_eq!(result, "1 2 3 4 5 6.5");
     }
 
     #[test]
@@ -144,10 +144,10 @@ mod tests {
 
     #[test]
     fn test_generate_lines_unbounded() {
+        //TODO: support vector
         let a = V![1, 2, 3];
         let b = V![4, 5, 6];
-        let lines = vec![a, b];
-        let result = IOElement::LinesUnbounded(lines.clone()).generate();
+        let result = LINES!(a, b).generate();
         assert_eq!(result, "1 4\n2 5\n3 6");
     }
 
@@ -183,18 +183,14 @@ mod tests {
 
     #[test]
     fn test_generate_raw_lines_unbounded() {
-        let lines = vec![
-            "Hello World".to_string(),
-            "Hello World".to_string(),
-            "Hello World".to_string(),
-        ];
-        let line = IOElement::RawLinesUnbounded(lines);
+        let line = RAW_LINES!("Hello", "World");
         let result = line.generate();
-        assert_eq!(result, "Hello World\nHello World\nHello World");
+        assert_eq!(result, "Hello\nWorld");
     }
 
     #[test]
     fn test_generate_grid() {
+        //TODO: make macro
         let grid = vec![V![1, 2, 3], V![4, 5, 6]];
         let result = IOElement::Grid(grid, 2, 3).generate();
         assert_eq!(result, "1 2 3\n4 5 6");

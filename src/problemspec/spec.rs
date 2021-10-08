@@ -67,14 +67,21 @@ macro_rules! EMPTY_LINE {
 }
 pub(crate) use EMPTY_LINE;
 
-// #[macro_export]
-// macro_rules! LINES {
-//     ($($x:expr) % ) => {
-//     };
-//     ($($x:expr)) => {
+#[macro_export]
+macro_rules! LINES {
+    ($($x:expr), + $(,) ?) => {
+        IOElement::LinesUnbounded(vec![$($x), +])
+    };
+}
+pub(crate) use LINES;
 
-//     };
-// }
+#[macro_export]
+macro_rules! RAW_LINES {
+    ($($x:expr), + $(,) ?) => {
+        IOElement::RawLinesUnbounded(vec![$(String::from($x)), +])
+    };
+}
+pub(crate) use RAW_LINES;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Scalar {
@@ -200,5 +207,24 @@ mod test {
             LV![1.5, 2.3],
             LineElement::UnboundedVec(vec![Scalar::Float(1.5), Scalar::Float(2.3)])
         );
+    }
+
+    #[test]
+    fn test_lines_macro() {
+        assert_eq!(
+            LINES!(V![1, 2, 3], V![4, 5, 6]),
+            IOElement::LinesUnbounded(vec![
+                vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)],
+                vec![Scalar::Int(4), Scalar::Int(5), Scalar::Int(6)],
+            ])
+        );
+    }
+
+    #[test]
+    fn test_raw_lines_macro() {
+        assert_eq!(
+            RAW_LINES!("hello", "world"),
+            IOElement::RawLinesUnbounded(vec!["hello".to_string(), "world".to_string()])
+        )
     }
 }
