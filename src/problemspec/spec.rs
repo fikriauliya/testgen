@@ -9,7 +9,7 @@ pub struct ConstraintsError {
 pub trait ProblemSpec {
     fn input_format(&self) -> IOFormat;
     // TODO: check output format
-    // fn output_format(&self) -> IOFormat;
+    fn output_format(&self) -> IOFormat;
     fn constraints(&self) -> Result<(), ConstraintsError>;
     fn multiple_test_case_config() -> Option<MultipleTestcaseConfig> {
         None

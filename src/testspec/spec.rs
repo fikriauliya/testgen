@@ -6,6 +6,7 @@ use rand::{
 
 pub trait TestSpec<T> {
     fn test_cases(random: &mut Random) -> Vec<T>;
+    fn sample_test_cases() -> Vec<T>;
 }
 
 pub struct Random {
