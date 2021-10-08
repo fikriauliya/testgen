@@ -1,7 +1,7 @@
 use testgen::cli::run;
-use testgen::cons;
 use testgen::problemspec::spec::*;
 use testgen::testspec::spec::*;
+use testgen::{CONS, LINE, LS};
 
 struct Spec {
     a: i64,
@@ -10,10 +10,7 @@ struct Spec {
 }
 impl ProblemSpec for Spec {
     fn input_format(&self) -> IOFormat {
-        vec![IOElement::Line(vec![
-            LineElement::Scalar(Scalar::Int(self.a)),
-            LineElement::Scalar(Scalar::Int(self.b)),
-        ])]
+        vec![LINE!(LS!(self.a), LS!(self.b))]
     }
 
     // fn output_format(&self) -> IOFormat {
@@ -24,13 +21,13 @@ impl ProblemSpec for Spec {
 
     fn multiple_test_case_config() -> Option<MultipleTestcaseConfig> {
         Some(MultipleTestcaseConfig {
-            constraints: |t| cons!(t < 10),
+            constraints: |t| CONS!(t < 10),
             output_prefix: Some("Case #".to_string()),
         })
     }
 
     fn constraints(&self) -> Result<(), ConstraintsError> {
-        cons!(self.a > 0, self.b > 0)
+        CONS!(self.a > 0, self.b > 0)
     }
 }
 impl TestSpec<Spec> for Spec {

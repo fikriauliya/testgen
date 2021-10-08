@@ -120,26 +120,20 @@ mod tests {
 
     #[test]
     fn test_generate_line() {
-        let line = IOElement::Line(vec![
-            LineElement::Scalar(Scalar::Int(1)),
+        let line = LINE!(
+            LS!(1),
             LineElement::BoundedVec(vec![Scalar::Int(2), Scalar::Int(3)], 2),
-            LineElement::UnboundedVec(vec![Scalar::Int(4), Scalar::Int(5)]),
-            LineElement::Scalar(Scalar::Int(6)),
-        ]);
+            LV!(4, 5),
+            LS!(6),
+        );
         let result = line.generate();
         assert_eq!(result, "1 2 3 4 5 6");
     }
 
     #[test]
     fn test_generate_lines_bounded() {
-        let a = vec![1, 2, 3]
-            .into_iter()
-            .map(Scalar::Int)
-            .collect::<Vec<_>>();
-        let b = vec![4, 5, 6]
-            .into_iter()
-            .map(Scalar::Int)
-            .collect::<Vec<_>>();
+        let a = V![1, 2, 3];
+        let b = V![4, 5, 6];
         let lines = vec![a, b];
         let result = IOElement::LinesBounded(lines.clone(), 3).generate();
         assert_eq!(result, "1 4\n2 5\n3 6");
@@ -150,14 +144,8 @@ mod tests {
 
     #[test]
     fn test_generate_lines_unbounded() {
-        let a = vec![1, 2, 3]
-            .into_iter()
-            .map(Scalar::Int)
-            .collect::<Vec<_>>();
-        let b = vec![4, 5, 6]
-            .into_iter()
-            .map(Scalar::Int)
-            .collect::<Vec<_>>();
+        let a = V![1, 2, 3];
+        let b = V![4, 5, 6];
         let lines = vec![a, b];
         let result = IOElement::LinesUnbounded(lines.clone()).generate();
         assert_eq!(result, "1 4\n2 5\n3 6");
@@ -165,14 +153,14 @@ mod tests {
 
     #[test]
     fn test_generate_raw_line() {
-        let line = IOElement::RawLine("Hello World".to_string());
+        let line = RAW_LINE!("Hello World");
         let result = line.generate();
         assert_eq!(result, "Hello World");
     }
 
     #[test]
     fn test_generate_empty_line() {
-        let line = IOElement::EmptyLine;
+        let line = EMPTY_LINE!();
         let result = line.generate();
         assert_eq!(result, "");
     }
@@ -207,30 +195,15 @@ mod tests {
 
     #[test]
     fn test_generate_grid() {
-        let grid = vec![
-            vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)],
-            vec![Scalar::Int(4), Scalar::Int(5), Scalar::Int(6)],
-        ];
+        let grid = vec![V![1, 2, 3], V![4, 5, 6]];
         let result = IOElement::Grid(grid, 2, 3).generate();
         assert_eq!(result, "1 2 3\n4 5 6");
 
-        let grid = vec![
-            vec![Scalar::Char('a'), Scalar::Char('b'), Scalar::Char('c')],
-            vec![Scalar::Char('d'), Scalar::Char('e'), Scalar::Char('f')],
-        ];
+        let grid = vec![V!['a', 'b', 'c'], V!['d', 'e', 'f']];
         let result = IOElement::Grid(grid, 2, 3).generate();
         assert_eq!(result, "abc\ndef");
 
-        let grid = vec![
-            vec![
-                Scalar::String("Hello".to_string()),
-                Scalar::String("World".to_string()),
-            ],
-            vec![
-                Scalar::String("Hi".to_string()),
-                Scalar::String("All".to_string()),
-            ],
-        ];
+        let grid = vec![V!["Hello", "World"], V!["Hi", "All"]];
         let result = IOElement::Grid(grid, 2, 2).generate();
         assert_eq!(result, "Hello World\nHi All");
     }
@@ -258,13 +231,13 @@ mod tests {
 
     #[test]
     fn test_generate_line_element() {
-        let element = LineElement::Scalar(Scalar::Int(1));
+        let element = LS!(1);
         assert_eq!(element.generate(), "1");
-        let element = LineElement::BoundedVec(vec![Scalar::Int(1), Scalar::Int(2)], 2);
+        let element = LineElement::BoundedVec(V![1, 2], 2);
         assert_eq!(element.generate(), "1 2");
-        let element = LineElement::BoundedVec(vec![Scalar::Int(1), Scalar::Int(2)], 1);
+        let element = LineElement::BoundedVec(V![1, 2], 1);
         assert_eq!(element.generate(), "1");
-        let element = LineElement::UnboundedVec(vec![Scalar::Int(1), Scalar::Int(2)]);
+        let element = LV![1, 2];
         assert_eq!(element.generate(), "1 2");
     }
 }

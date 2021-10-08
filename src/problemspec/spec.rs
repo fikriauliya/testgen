@@ -25,7 +25,7 @@ pub struct MultipleTestcaseConfig {
 
 pub type IOFormat = Vec<IOElement>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum IOElement {
     Line(Vec<LineElement>),
     RawLine(String),
@@ -37,7 +37,46 @@ pub enum IOElement {
     Grid(Vec<Vec<Scalar>>, Size, Size),
 }
 
-#[derive(Debug, Clone)]
+#[macro_export]
+macro_rules! LINE {
+    ($($x : expr), + $(,) ?) => {
+        {
+            let mut contents = Vec::new();
+            $(
+                contents.push($x);
+            )*
+            IOElement::Line(contents)
+        }
+    };
+}
+pub(crate) use LINE;
+
+#[macro_export]
+macro_rules! RAW_LINE {
+    ($x:expr) => {
+        IOElement::RawLine($x.to_string())
+    };
+}
+pub(crate) use RAW_LINE;
+
+#[macro_export]
+macro_rules! EMPTY_LINE {
+    () => {
+        IOElement::EmptyLine
+    };
+}
+pub(crate) use EMPTY_LINE;
+
+// #[macro_export]
+// macro_rules! LINES {
+//     ($($x:expr) % ) => {
+//     };
+//     ($($x:expr)) => {
+
+//     };
+// }
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum Scalar {
     UInt(u64),
     Float(f64),
@@ -47,7 +86,7 @@ pub enum Scalar {
     Bool(bool),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum LineElement {
     Scalar(Scalar),
     BoundedVec(Vec<Scalar>, Size),
@@ -55,8 +94,35 @@ pub enum LineElement {
 }
 
 #[macro_export]
-macro_rules! cons {
-    ($($x:expr),*) => {
+macro_rules! LS {
+    ($x:expr) => {{
+        let x = $x;
+        let result: Scalar = x.into();
+        LineElement::Scalar(result)
+    }};
+}
+pub(crate) use LS;
+
+#[macro_export]
+macro_rules! LV {
+    ($($x:expr), + $(,) ?) => {{
+        LineElement::UnboundedVec(V![$($x), +])
+    }};
+}
+pub(crate) use LV;
+
+#[macro_export]
+macro_rules! V {
+    ($($x : expr), + $(,) ?) => {{
+        let res:Vec<Scalar> = vec![$($x), +].into_iter().map(|x| x.into()).collect();
+        res
+    }}
+}
+pub(crate) use V;
+
+#[macro_export]
+macro_rules! CONS {
+    ($($x : expr), + $(,) ?) => {
         {
             let mut errors = Vec::new();
             $(
@@ -71,4 +137,68 @@ macro_rules! cons {
             }
         }
     };
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_line_macro() {
+        assert_eq!(
+            LINE!(LineElement::Scalar(Scalar::UInt(1))),
+            IOElement::Line(vec![LineElement::Scalar(Scalar::UInt(1)),])
+        );
+
+        assert_eq!(
+            LINE!(
+                LineElement::Scalar(Scalar::UInt(1)),
+                LineElement::Scalar(Scalar::Int(2))
+            ),
+            IOElement::Line(vec![
+                LineElement::Scalar(Scalar::UInt(1)),
+                LineElement::Scalar(Scalar::Int(2)),
+            ])
+        );
+    }
+
+    #[test]
+    fn test_raw_line_macro() {
+        assert_eq!(RAW_LINE!("hello"), IOElement::RawLine("hello".to_string()));
+    }
+
+    #[test]
+    fn test_generate_empty_line_macro() {
+        assert_eq!(EMPTY_LINE!(), IOElement::EmptyLine);
+    }
+
+    #[test]
+    fn test_v_macro() {
+        assert_eq!(V![1], vec![Scalar::Int(1)]);
+        assert_eq!(V![1.5, 2.3], vec![Scalar::Float(1.5), Scalar::Float(2.3)]);
+        assert_eq!(V!['H', 'E'], vec![Scalar::Char('H'), Scalar::Char('E')]);
+        assert_eq!(
+            V!["hello", "world"],
+            vec![
+                Scalar::String("hello".to_string()),
+                Scalar::String("world".to_string())
+            ]
+        );
+    }
+
+    #[test]
+    fn test_ls_macro() {
+        assert_eq!(LS!(1), LineElement::Scalar(Scalar::Int(1)));
+        assert_eq!(LS!(1.5), LineElement::Scalar(Scalar::Float(1.5)));
+        assert_eq!(LS!('H'), LineElement::Scalar(Scalar::Char('H')));
+    }
+
+    #[test]
+    fn test_lv_macro() {
+        assert_eq!(LV![1], LineElement::UnboundedVec(vec![Scalar::Int(1)]));
+        assert_eq!(
+            LV![1.5, 2.3],
+            LineElement::UnboundedVec(vec![Scalar::Float(1.5), Scalar::Float(2.3)])
+        );
+    }
 }
