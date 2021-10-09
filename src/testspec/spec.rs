@@ -4,9 +4,21 @@ use rand::{
     Rng, SeedableRng,
 };
 
-pub trait TestSpec<T> {
-    fn test_cases(random: &mut Random) -> Vec<T>;
+use crate::problemspec::spec::MultitaskProblemSpec;
+
+pub trait SingletaskTestSpec<T> {
     fn sample_test_cases() -> Vec<T>;
+    fn test_cases(random: &mut Random) -> Vec<T>;
+}
+
+pub trait MultitaskTestSpec<T>
+where
+    T: MultitaskProblemSpec<T>,
+{
+    fn sample_test_cases() -> Vec<T>;
+    fn test_cases_subtask_1(random: &mut Random) -> Option<Vec<T>>;
+    fn test_cases_subtask_2(random: &mut Random) -> Option<Vec<T>>;
+    fn test_cases_subtask_3(random: &mut Random) -> Option<Vec<T>>;
 }
 
 pub struct Random {

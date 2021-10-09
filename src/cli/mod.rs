@@ -43,7 +43,7 @@ struct GradeCommand {
 
 pub fn run<T>()
 where
-    T: ProblemSpec + TestSpec<T>,
+    T: ProblemSpec<T> + SingletaskTestSpec<T>,
 {
     let opts: Opts = Opts::parse();
 

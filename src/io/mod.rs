@@ -65,7 +65,7 @@ fn check_output(
 
 pub fn generate_sample_test_cases<T>(base_folder: &str) -> Result<(), GenerateSampleTestCaseError>
 where
-    T: ProblemSpec + TestSpec<T>,
+    T: ProblemSpec<T> + SingletaskTestSpec<T>,
 {
     let specs = T::sample_test_cases();
     let base_folder = prepare_folder(&base_folder)?;
@@ -129,7 +129,7 @@ pub fn generate_inputs_outputs<T>(
     seed: u64,
 ) -> Result<(), GenerateInputOutputError>
 where
-    T: ProblemSpec + TestSpec<T>,
+    T: ProblemSpec<T> + SingletaskTestSpec<T>,
 {
     let mut random = Random::new(seed);
     let specs = T::test_cases(&mut random);

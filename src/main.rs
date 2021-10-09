@@ -8,7 +8,7 @@ struct Spec {
     b: i64,
     sum: Option<i64>,
 }
-impl ProblemSpec for Spec {
+impl ProblemSpec<Spec> for Spec {
     fn input_format(&self) -> IOFormat {
         vec![LINE!(LS!(self.a), LS!(self.b))]
     }
@@ -28,7 +28,24 @@ impl ProblemSpec for Spec {
         CONS!(self.a > 0, self.b > 0)
     }
 }
-impl TestSpec<Spec> for Spec {
+
+impl MultitaskProblemSpec<Spec> for Spec {
+    fn subtask_1() -> Option<SubtaskConfig<Spec>> {
+        Some(SubtaskConfig {
+            score: 20,
+            constraints: |s| CONS!(s.a < 10),
+        })
+    }
+
+    fn subtask_2() -> Option<SubtaskConfig<Spec>> {
+        Some(SubtaskConfig {
+            score: 80,
+            constraints: |s| CONS!(s.b < 10),
+        })
+    }
+}
+
+impl SingletaskTestSpec<Spec> for Spec {
     fn test_cases(random: &mut Random) -> Vec<Spec> {
         let mut result = Vec::new();
         for _ in 0..9 {

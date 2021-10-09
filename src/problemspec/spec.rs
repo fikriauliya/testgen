@@ -6,7 +6,7 @@ pub struct ConstraintsError {
     pub messages: Vec<String>,
 }
 
-pub trait ProblemSpec {
+pub trait ProblemSpec<T> {
     fn input_format(&self) -> IOFormat;
     // TODO: check output format
     fn output_format(&self) -> IOFormat;
@@ -16,11 +16,28 @@ pub trait ProblemSpec {
     }
 }
 
+pub trait MultitaskProblemSpec<T> {
+    fn subtask_1() -> Option<SubtaskConfig<T>> {
+        None
+    }
+    fn subtask_2() -> Option<SubtaskConfig<T>> {
+        None
+    }
+    fn subtask_3() -> Option<SubtaskConfig<T>> {
+        None
+    }
+}
+
 pub type Size = usize;
 
 pub struct MultipleTestcaseConfig {
     pub constraints: fn(usize) -> Result<(), ConstraintsError>,
     pub output_prefix: Option<String>,
+}
+
+pub struct SubtaskConfig<T> {
+    pub score: u8,
+    pub constraints: fn(T) -> Result<(), ConstraintsError>,
 }
 
 pub type IOFormat = Vec<IOElement>;
