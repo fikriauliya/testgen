@@ -49,9 +49,11 @@ impl SingletaskTestSpec<Spec> for Spec {
     fn test_cases(random: &mut Random) -> Vec<Spec> {
         let mut result = Vec::new();
         for _ in 0..9 {
-            let a = random.next_range(1, 10);
-            let b = random.next_range(1, 10);
-            result.push(Spec { a, b, sum: None });
+            result.push(Spec {
+                a: random.next_range(1, 10),
+                b: random.next_range(1, 10),
+                sum: None,
+            });
         }
         result
     }
@@ -75,18 +77,22 @@ impl MultitaskTestSpec<Spec> for Spec {
     fn test_cases_subtask_1(random: &mut Random) -> Option<Vec<Spec>> {
         let mut result = Vec::new();
         for _ in 0..9 {
-            let a = random.next_range(1, 10);
-            let b = random.next_range(1, 10);
-            result.push(Spec { a, b, sum: None });
+            result.push(Spec {
+                a: random.next_range(1, 10),
+                b: random.next_range(1, 10),
+                sum: None,
+            });
         }
         Some(result)
     }
     fn test_cases_subtask_2(random: &mut Random) -> Option<Vec<Spec>> {
         let mut result = Vec::new();
         for _ in 0..9 {
-            let a = random.next_range(1, 100);
-            let b = random.next_range(1, 100);
-            result.push(Spec { a, b, sum: None });
+            result.push(Spec {
+                a: random.next_range(1, 100),
+                b: random.next_range(1, 100),
+                sum: None,
+            });
         }
         Some(result)
     }
@@ -109,5 +115,6 @@ impl MultitaskTestSpec<Spec> for Spec {
 
 fn main() {
     run_multi::<Spec>();
+    // Uncomment this and comment the previous line to turn on single-task mode
     // run::<Spec>();
 }
