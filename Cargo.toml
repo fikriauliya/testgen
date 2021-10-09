@@ -1,6 +1,6 @@
 [package]
 name = "testgen"
-version = "0.2.4"
+version = "0.2.5"
 authors = ["Pahlevi Fikri Auliya <pahlevi.fikri.auliya@gmail.com>"]
 edition = "2018"
 
