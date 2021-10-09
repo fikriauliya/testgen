@@ -40,7 +40,7 @@ impl MultitaskProblemSpec<Spec> for Spec {
     fn subtask_2() -> Option<SubtaskConfig<Spec>> {
         Some(SubtaskConfig {
             score: 80,
-            constraints: |s| CONS!(s.b <= 10),
+            constraints: |s| CONS!(s.b <= 100),
         })
     }
 }
@@ -84,8 +84,8 @@ impl MultitaskTestSpec<Spec> for Spec {
     fn test_cases_subtask_2(random: &mut Random) -> Option<Vec<Spec>> {
         let mut result = Vec::new();
         for _ in 0..9 {
-            let a = random.next_range(1, 10);
-            let b = random.next_range(1, 10);
+            let a = random.next_range(1, 100);
+            let b = random.next_range(1, 100);
             result.push(Spec { a, b, sum: None });
         }
         Some(result)
