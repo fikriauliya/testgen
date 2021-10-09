@@ -124,15 +124,15 @@ macro_rules! LS {
 #[macro_export]
 macro_rules! LV {
     ($x:expr) => {
-        LineElement::UnboundedVec(V![$x])
+        LineElement::UnboundedVec(V![&$x])
     };
 }
 
 #[macro_export]
 macro_rules! V {
     ($x:expr) => {{
-        let v = $x;
-        let res: Vec<Scalar> = v.into_iter().map(|x| x.into()).collect();
+        let v = &$x;
+        let res: Vec<Scalar> = v.iter().map(|x| (*x).into()).collect();
         res
     }};
 }
@@ -212,6 +212,13 @@ mod test {
     }
 
     #[test]
+    fn test_v_macro_doesnt_move() {
+        let v = vec![1, 2, 3];
+        assert_eq!(V![v], vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)]);
+        assert_eq!(V![v], vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)]);
+    }
+
+    #[test]
     fn test_ls_macro() {
         assert_eq!(LS!(1), LineElement::Scalar(Scalar::Int(1)));
         assert_eq!(LS!(1.5), LineElement::Scalar(Scalar::Float(1.5)));
@@ -227,6 +234,19 @@ mod test {
         assert_eq!(
             LV![vec![1.5, 2.3]],
             LineElement::UnboundedVec(vec![Scalar::Float(1.5), Scalar::Float(2.3)])
+        );
+    }
+
+    #[test]
+    fn test_lv_macro_doesnt_move() {
+        let v = vec![1, 2, 3];
+        assert_eq!(
+            LV![v],
+            LineElement::UnboundedVec(vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)])
+        );
+        assert_eq!(
+            LV![v],
+            LineElement::UnboundedVec(vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)])
         );
     }
 
