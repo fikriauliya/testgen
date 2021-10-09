@@ -132,7 +132,7 @@ macro_rules! LV {
 macro_rules! V {
     ($x:expr) => {{
         let v = &$x;
-        let res: Vec<Scalar> = v.iter().map(|x| (*x).into()).collect();
+        let res: Vec<Scalar> = v.iter().map(|x| x.clone().into()).collect();
         res
     }};
 }
@@ -216,6 +216,18 @@ mod test {
         let v = vec![1, 2, 3];
         assert_eq!(V![v], vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)]);
         assert_eq!(V![v], vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)]);
+    }
+
+    #[test]
+    fn test_v_macro_support_string() {
+        let v = vec!["Hello".to_string(), "World".to_string()];
+        assert_eq!(
+            V![v],
+            vec![
+                Scalar::String("Hello".to_string()),
+                Scalar::String("World".to_string())
+            ]
+        );
     }
 
     #[test]
