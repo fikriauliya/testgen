@@ -125,7 +125,7 @@ mod tests {
         let line = LINE!(
             LS!(1),
             LineElement::BoundedVec(vec![Scalar::Int(2), Scalar::Int(3)], 2),
-            LV![4, 5],
+            LV![vec![4, 5]],
             LS!(6.5),
         );
         let result = line.generate();
@@ -134,8 +134,8 @@ mod tests {
 
     #[test]
     fn test_generate_lines_bounded() {
-        let a = V![1, 2, 3];
-        let b = V![4, 5, 6];
+        let a = V![vec![1, 2, 3]];
+        let b = V![vec![4, 5, 6]];
         let lines = vec![a, b];
         let result = IOElement::LinesBounded(lines.clone(), 3).generate();
         assert_eq!(result, "1 4\n2 5\n3 6");
@@ -146,9 +146,8 @@ mod tests {
 
     #[test]
     fn test_generate_lines_unbounded() {
-        //TODO: support vector
-        let a = V![1, 2, 3];
-        let b = V![4, 5, 6];
+        let a = V![vec![1, 2, 3]];
+        let b = V![vec![4, 5, 6]];
         let result = LINES!(a, b).generate();
         assert_eq!(result, "1 4\n2 5\n3 6");
     }
@@ -193,15 +192,15 @@ mod tests {
     #[test]
     fn test_generate_grid() {
         //TODO: make macro
-        let grid = vec![V![1, 2, 3], V![4, 5, 6]];
+        let grid = vec![V![vec![1, 2, 3]], V![vec![4, 5, 6]]];
         let result = IOElement::Grid(grid, 2, 3).generate();
         assert_eq!(result, "1 2 3\n4 5 6");
 
-        let grid = vec![V!['a', 'b', 'c'], V!['d', 'e', 'f']];
+        let grid = vec![V![vec!['a', 'b', 'c']], V![vec!['d', 'e', 'f']]];
         let result = IOElement::Grid(grid, 2, 3).generate();
         assert_eq!(result, "abc\ndef");
 
-        let grid = vec![V!["Hello", "World"], V!["Hi", "All"]];
+        let grid = vec![V![vec!["Hello", "World"]], V![vec!["Hi", "All"]]];
         let result = IOElement::Grid(grid, 2, 2).generate();
         assert_eq!(result, "Hello World\nHi All");
     }
@@ -231,11 +230,11 @@ mod tests {
     fn test_generate_line_element() {
         let element = LS!(1);
         assert_eq!(element.generate(), "1");
-        let element = LineElement::BoundedVec(V![1, 2], 2);
+        let element = LineElement::BoundedVec(V![vec![1, 2]], 2);
         assert_eq!(element.generate(), "1 2");
-        let element = LineElement::BoundedVec(V![1, 2], 1);
+        let element = LineElement::BoundedVec(V![vec![1, 2]], 1);
         assert_eq!(element.generate(), "1");
-        let element = LV![1, 2];
+        let element = LV![vec![1, 2]];
         assert_eq!(element.generate(), "1 2");
     }
 }

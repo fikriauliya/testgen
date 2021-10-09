@@ -123,17 +123,18 @@ macro_rules! LS {
 
 #[macro_export]
 macro_rules! LV {
-    ($($x:expr), + $(,) ?) => {{
-        LineElement::UnboundedVec(V![$($x), +])
-    }};
+    ($x:expr) => {
+        LineElement::UnboundedVec(V![$x])
+    };
 }
 
 #[macro_export]
 macro_rules! V {
-    ($($x : expr), + $(,) ?) => {{
-        let res:Vec<Scalar> = vec![$($x), +].into_iter().map(|x| x.into()).collect();
+    ($x:expr) => {{
+        let v = $x;
+        let res: Vec<Scalar> = v.into_iter().map(|x| x.into()).collect();
         res
-    }}
+    }};
 }
 
 #[macro_export]
@@ -190,16 +191,24 @@ mod test {
 
     #[test]
     fn test_v_macro() {
-        assert_eq!(V![1], vec![Scalar::Int(1)]);
-        assert_eq!(V![1.5, 2.3], vec![Scalar::Float(1.5), Scalar::Float(2.3)]);
-        assert_eq!(V!['H', 'E'], vec![Scalar::Char('H'), Scalar::Char('E')]);
+        assert_eq!(V![vec![1]], vec![Scalar::Int(1)]);
         assert_eq!(
-            V!["hello", "world"],
+            V![vec![1.5, 2.3]],
+            vec![Scalar::Float(1.5), Scalar::Float(2.3)]
+        );
+        assert_eq!(
+            V![vec!['H', 'E']],
+            vec![Scalar::Char('H'), Scalar::Char('E')]
+        );
+        assert_eq!(
+            V![vec!["hello", "world"]],
             vec![
                 Scalar::String("hello".to_string()),
                 Scalar::String("world".to_string())
             ]
         );
+
+        assert_eq!(V![vec![1]], vec![Scalar::Int(1)]);
     }
 
     #[test]
@@ -211,9 +220,12 @@ mod test {
 
     #[test]
     fn test_lv_macro() {
-        assert_eq!(LV![1], LineElement::UnboundedVec(vec![Scalar::Int(1)]));
         assert_eq!(
-            LV![1.5, 2.3],
+            LV![vec![1]],
+            LineElement::UnboundedVec(vec![Scalar::Int(1)])
+        );
+        assert_eq!(
+            LV![vec![1.5, 2.3]],
             LineElement::UnboundedVec(vec![Scalar::Float(1.5), Scalar::Float(2.3)])
         );
     }
@@ -221,7 +233,7 @@ mod test {
     #[test]
     fn test_lines_macro() {
         assert_eq!(
-            LINES!(V![1, 2, 3], V![4, 5, 6]),
+            LINES!(V![vec![1, 2, 3]], V![vec![4, 5, 6]]),
             IOElement::LinesUnbounded(vec![
                 vec![Scalar::Int(1), Scalar::Int(2), Scalar::Int(3)],
                 vec![Scalar::Int(4), Scalar::Int(5), Scalar::Int(6)],
