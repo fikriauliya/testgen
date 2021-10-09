@@ -1,5 +1,5 @@
-use super::io::*;
 use super::problemspec::spec::*;
+use super::runner::*;
 use super::testspec::spec::*;
 use clap::{AppSettings, Clap};
 
@@ -43,54 +43,73 @@ struct GradeCommand {
 
 pub fn run<T>()
 where
-    T: ProblemSpec<T> + SingletaskTestSpec<T>,
+    T: SingletaskTestSpec<T> + ProblemSpec<T>,
 {
     let opts: Opts = Opts::parse();
 
     match opts.subcmd {
-        SubCommand::Generate(g) => {
-            println!("[ SAMPLE TEST CASES ]");
-            match generate_sample_test_cases::<T>(&"samples") {
-                Ok(_) => {}
-                Err(err) => {
-                    println!("  ❌");
-                    match err {
-                        GenerateSampleTestCaseError::ConstraintsError(errors) => {
-                            for error in &errors.messages {
-                                println!("    * Expected: {}", error);
-                            }
-                        }
-                        GenerateSampleTestCaseError::IOError(error) => {
-                            println!("    * IO error: {}", error);
-                        }
-                    }
-                }
+        SubCommand::Generate(g) => match run_single_testcase::<T>(&g.output, g.solution, g.seed) {
+            Ok(_) => {}
+            Err(err) => {
+                println!("{}", err);
             }
-
-            println!();
-            println!("[ OFFICIAL TEST CASES ]");
-            match generate_inputs_outputs::<T>(&g.output, g.solution, g.seed) {
-                Ok(_) => {}
-                Err(err) => {
-                    println!("  ❌");
-                    match err {
-                        GenerateInputOutputError::ConstraintsError(errors) => {
-                            for error in &errors.messages {
-                                println!("    * Expected: {}", error);
-                            }
-                        }
-                        GenerateInputOutputError::OutputFormatError(error) => {
-                            println!("    * Formatting error: {}", error);
-                        }
-                        GenerateInputOutputError::IOError(error) => {
-                            println!("    * IO error: {}", error);
-                        }
-                    }
-                }
-            }
-        }
+        },
         SubCommand::Grade(_) => {
             todo!()
         }
     }
 }
+
+// pub fn run_multi<T>()
+// where
+//     T: MultitaskProblemSpec<T> + MultitaskTestSpec<T>,
+// {
+//     let opts: Opts = Opts::parse();
+
+//     match opts.subcmd {
+//         SubCommand::Generate(g) => {
+//             println!("[ SAMPLE TEST CASES ]");
+//             match generate_sample_test_cases::<T>(&"samples") {
+//                 Ok(_) => {}
+//                 Err(err) => {
+//                     println!("  ❌");
+//                     match err {
+//                         GenerateSampleTestCaseError::ConstraintsError(errors) => {
+//                             for error in &errors.messages {
+//                                 println!("    * Expected: {}", error);
+//                             }
+//                         }
+//                         GenerateSampleTestCaseError::IOError(error) => {
+//                             println!("    * IO error: {}", error);
+//                         }
+//                     }
+//                 }
+//             }
+
+//             println!();
+//             println!("[ OFFICIAL TEST CASES ]");
+//             match generate_inputs_outputs::<T>(&g.output, g.solution, g.seed) {
+//                 Ok(_) => {}
+//                 Err(err) => {
+//                     println!("  ❌");
+//                     match err {
+//                         GenerateInputOutputError::ConstraintsError(errors) => {
+//                             for error in &errors.messages {
+//                                 println!("    * Expected: {}", error);
+//                             }
+//                         }
+//                         GenerateInputOutputError::OutputFormatError(error) => {
+//                             println!("    * Formatting error: {}", error);
+//                         }
+//                         GenerateInputOutputError::IOError(error) => {
+//                             println!("    * IO error: {}", error);
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//         SubCommand::Grade(_) => {
+//             todo!()
+//         }
+//     }
+// }
