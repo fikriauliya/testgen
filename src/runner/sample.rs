@@ -5,7 +5,7 @@ use crate::{
         generator::Generator,
         spec::{ConstraintsError, MultitaskProblemSpec, ProblemSpec},
     },
-    runner::io::write_file,
+    runner::{executor, io::write_file},
     testspec::spec::{MultitaskTestSpec, SingletaskTestSpec},
 };
 use thiserror::Error;
@@ -16,8 +16,16 @@ pub enum GenerateSampleTestCaseError {
     ConstraintsError(#[from] ConstraintsError),
     #[error("IO Error")]
     IOError(#[from] std::io::Error),
+    #[error("Sample output mismatch")]
+    SampleOutputMismatch(String, String),
 }
-fn _generate<T>(base_folder: &Path, specs: Vec<T>) -> Result<(), GenerateSampleTestCaseError>
+//TODO: refactor, extract common logics
+//TODO: unit test
+fn _generate<T>(
+    base_folder: &Path,
+    specs: Vec<T>,
+    solution_command: Option<&str>,
+) -> Result<(), GenerateSampleTestCaseError>
 where
     T: ProblemSpec<T>,
 {
@@ -53,6 +61,23 @@ where
             let input_path = base_folder.join(format!("sample_{}.in", 1));
             write_file(&inputs, &input_path)?;
 
+            if let Some(solution_command) = &solution_command {
+                let expected_output = executor::execute(&solution_command, &inputs);
+                //TODO: zip only takes the lower len, check the remaining
+                for (expected_output, output) in expected_output
+                    .split("\n")
+                    .into_iter()
+                    .zip(outputs.split("\n").into_iter())
+                {
+                    if expected_output != output {
+                        return Err(GenerateSampleTestCaseError::SampleOutputMismatch(
+                            expected_output.to_string(),
+                            output.to_string(),
+                        ));
+                    }
+                }
+            }
+
             let output_path = base_folder.join(format!("sample_{}.out", 1));
             write_file(&outputs, &output_path)?;
             Ok(())
@@ -68,6 +93,24 @@ where
 
                 let output = spec.output_format().generate();
                 let output_path = base_folder.join(format!("sample_{}.out", i + 1));
+
+                if let Some(solution_command) = &solution_command {
+                    let expected_output = executor::execute(&solution_command, &input);
+                    //TODO: zip only takes the lower len, check the remaining
+                    for (expected_output, output) in expected_output
+                        .split("\n")
+                        .into_iter()
+                        .zip(output.split("\n").into_iter())
+                    {
+                        if expected_output != output {
+                            return Err(GenerateSampleTestCaseError::SampleOutputMismatch(
+                                expected_output.to_string(),
+                                output.to_string(),
+                            ));
+                        }
+                    }
+                }
+
                 write_file(&output, &output_path)?;
             }
             Ok(())
@@ -75,18 +118,24 @@ where
     }
 }
 
-pub fn generate<T>(base_folder: &Path) -> Result<(), GenerateSampleTestCaseError>
+pub fn generate<T>(
+    base_folder: &Path,
+    solution_command: Option<&str>,
+) -> Result<(), GenerateSampleTestCaseError>
 where
     T: ProblemSpec<T> + SingletaskTestSpec<T>,
 {
     let specs = T::sample_test_cases();
-    _generate(base_folder, specs)
+    _generate(base_folder, specs, solution_command)
 }
 
-pub fn generate_multitask<T>(base_folder: &Path) -> Result<(), GenerateSampleTestCaseError>
+pub fn generate_multitask<T>(
+    base_folder: &Path,
+    solution_command: Option<&str>,
+) -> Result<(), GenerateSampleTestCaseError>
 where
     T: ProblemSpec<T> + MultitaskProblemSpec<T> + MultitaskTestSpec<T>,
 {
     let specs = T::sample_test_cases();
-    _generate(base_folder, specs)
+    _generate(base_folder, specs, solution_command)
 }

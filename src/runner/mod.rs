@@ -34,7 +34,7 @@ where
     let base_folder = prepare_folder(base_folder)?;
 
     println!("[ SAMPLE TEST CASES ]");
-    match sample::generate::<T>(base_folder) {
+    match sample::generate::<T>(base_folder, solution_command) {
         Ok(_) => Ok(()),
         Err(err) => {
             println!("  ❌");
@@ -46,6 +46,13 @@ where
                 }
                 GenerateSampleTestCaseError::IOError(error) => {
                     println!("    * IO error: {}", error);
+                }
+                GenerateSampleTestCaseError::SampleOutputMismatch(expected, found) => {
+                    println!("    * Sample output mismatch");
+                    println!("      * Expected:");
+                    println!("        {}", expected);
+                    println!("      * Found:");
+                    println!(" .      {}", found);
                 }
             }
             Err(err)
@@ -88,7 +95,7 @@ where
     let base_folder = prepare_folder(base_folder)?;
 
     println!("[ SAMPLE TEST CASES ]");
-    match sample::generate_multitask::<T>(base_folder) {
+    match sample::generate_multitask::<T>(base_folder, solution_command) {
         Ok(_) => Ok(()),
         Err(err) => {
             println!("  ❌");
@@ -100,6 +107,13 @@ where
                 }
                 GenerateSampleTestCaseError::IOError(error) => {
                     println!("    * IO error: {}", error);
+                }
+                GenerateSampleTestCaseError::SampleOutputMismatch(expected, found) => {
+                    println!("    * Sample output mismatch");
+                    println!("      * Expected:");
+                    println!("        {}", expected);
+                    println!("      * Found:");
+                    println!(" .      {}", found);
                 }
             }
             Err(err)
