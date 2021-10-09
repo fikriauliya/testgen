@@ -62,12 +62,12 @@ where
             write_file(&inputs, &input_path)?;
 
             if let Some(solution_command) = &solution_command {
-                let expected_output = executor::execute(&solution_command, &inputs);
+                let observed_output = executor::execute(&solution_command, &inputs);
                 //TODO: zip only takes the lower len, check the remaining
-                for (expected_output, output) in expected_output
+                for (expected_output, output) in outputs
                     .split("\n")
                     .into_iter()
-                    .zip(outputs.split("\n").into_iter())
+                    .zip(observed_output.split("\n").into_iter())
                 {
                     if expected_output != output {
                         return Err(GenerateSampleTestCaseError::SampleOutputMismatch(
@@ -95,12 +95,12 @@ where
                 let output_path = base_folder.join(format!("sample_{}.out", i + 1));
 
                 if let Some(solution_command) = &solution_command {
-                    let expected_output = executor::execute(&solution_command, &input);
+                    let observed_output = executor::execute(&solution_command, &input);
                     //TODO: zip only takes the lower len, check the remaining
-                    for (expected_output, output) in expected_output
+                    for (expected_output, output) in output
                         .split("\n")
                         .into_iter()
-                        .zip(output.split("\n").into_iter())
+                        .zip(observed_output.split("\n").into_iter())
                     {
                         if expected_output != output {
                             return Err(GenerateSampleTestCaseError::SampleOutputMismatch(
