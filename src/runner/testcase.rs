@@ -3,10 +3,10 @@ use std::path::Path;
 use crate::{
     problemspec::{
         generator::Generator,
-        spec::{ConstraintsError, MultipleTestcaseConfig, ProblemSpec},
+        spec::{ConstraintsError, MultipleTestcaseConfig, MultitaskProblemSpec, ProblemSpec},
     },
     runner::{executor, io::write_file},
-    testspec::spec::{Random, SingletaskTestSpec},
+    testspec::spec::{MultitaskTestSpec, Random, SingletaskTestSpec},
 };
 use thiserror::Error;
 
@@ -38,24 +38,27 @@ pub enum GenerateInputOutputError {
     IOError(#[from] std::io::Error),
 }
 
-pub fn generate<T>(
+fn _generate<T>(
     base_folder: &Path,
-    solution_command: Option<String>,
-    seed: u64,
+    specs: &Vec<T>,
+    multi_test_config: Option<&MultipleTestcaseConfig>,
+    solution_command: Option<&str>,
+    name_prefix: Option<&str>,
+    subtask_constraints: Option<fn(&T) -> Result<(), ConstraintsError>>,
 ) -> Result<(), GenerateInputOutputError>
 where
-    T: ProblemSpec<T> + SingletaskTestSpec<T>,
+    T: ProblemSpec<T>,
 {
-    let mut random = Random::new(seed);
-    let specs = T::test_cases(&mut random);
-
-    match T::multiple_test_case_config() {
+    match multi_test_config {
         Some(multi_test_config) => {
             let mut inputs = String::new();
             let t = specs.len();
             inputs.push_str(format!("{}\n", t).as_str());
             for (i, spec) in specs.iter().enumerate() {
                 println!("Testcase #{}...", i + 1);
+                if let Some(subtask_constraints) = subtask_constraints {
+                    subtask_constraints(&spec)?;
+                }
                 spec.constraints()?;
 
                 let input = spec.input_format().generate();
@@ -67,7 +70,13 @@ where
             let constraints = multi_test_config.constraints;
             constraints(t)?;
 
-            let input_path = base_folder.join(format!("{}.in", 1));
+            let file_name = if let Some(name_prefix) = name_prefix {
+                format!("{}", name_prefix)
+            } else {
+                format!("{}", 1)
+            };
+
+            let input_path = base_folder.join(format!("{}.in", file_name));
             write_file(&inputs, &input_path)?;
 
             if let Some(solution_command) = &solution_command {
@@ -75,7 +84,7 @@ where
 
                 check_output(&multi_test_config, &output)?;
 
-                let output_path = base_folder.join(format!("{}.out", 1));
+                let output_path = base_folder.join(format!("{}.out", file_name));
                 write_file(&output, &output_path)?;
             }
             Ok(())
@@ -83,20 +92,87 @@ where
         None => {
             for (i, spec) in specs.iter().enumerate() {
                 println!("Testcase #{}...", i + 1);
+                if let Some(subtask_constraints) = subtask_constraints {
+                    subtask_constraints(&spec)?;
+                }
                 spec.constraints()?;
 
+                let file_name = if let Some(name_prefix) = name_prefix {
+                    format!("{}_{}", name_prefix, i + 1)
+                } else {
+                    format!("{}", i + 1)
+                };
                 let input = spec.input_format().generate();
-                let input_path = base_folder.join(format!("{}.in", i + 1));
+                let input_path = base_folder.join(format!("{}.in", file_name));
                 write_file(&input, &input_path)?;
 
                 if let Some(solution_command) = &solution_command {
                     let output = executor::execute(&solution_command, &input);
 
-                    let output_path = base_folder.join(format!("{}.out", i + 1));
+                    let output_path = base_folder.join(format!("{}.out", file_name));
                     write_file(&output, &output_path)?;
                 }
             }
             Ok(())
         }
     }
+}
+
+pub fn generate<T>(
+    base_folder: &Path,
+    solution_command: Option<&str>,
+    seed: u64,
+) -> Result<(), GenerateInputOutputError>
+where
+    T: ProblemSpec<T> + SingletaskTestSpec<T>,
+{
+    let mut random = Random::new(seed);
+    let specs = T::test_cases(&mut random);
+    let multi_test_config = T::multiple_test_case_config();
+    _generate(
+        base_folder,
+        &specs,
+        multi_test_config.as_ref(),
+        solution_command,
+        None,
+        None,
+    )
+}
+
+pub fn generate_multitask<T>(
+    base_folder: &Path,
+    solution_command: Option<&str>,
+    seed: u64,
+) -> Result<(), GenerateInputOutputError>
+where
+    T: ProblemSpec<T> + MultitaskTestSpec<T> + MultitaskProblemSpec<T>,
+{
+    let mut random = Random::new(seed);
+    let configs = [T::subtask_1(), T::subtask_2(), T::subtask_3()];
+    let specs = [
+        T::test_cases_subtask_1(&mut random),
+        T::test_cases_subtask_2(&mut random),
+        T::test_cases_subtask_3(&mut random),
+    ];
+    let multi_test_config = T::multiple_test_case_config();
+
+    for (i, (spec, config)) in specs.iter().zip(configs.iter()).enumerate() {
+        match (spec, config) {
+            (Some(spec), Some(config)) => {
+                let subtask_constraints = config.constraints;
+                println!("Subtask #{}...", i + 1);
+
+                _generate(
+                    base_folder,
+                    spec,
+                    multi_test_config.as_ref(),
+                    solution_command,
+                    Some(i.to_string().as_str()),
+                    Some(subtask_constraints),
+                )?;
+            }
+            _ => {}
+        }
+    }
+    Ok(())
 }

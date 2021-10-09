@@ -48,12 +48,34 @@ where
     let opts: Opts = Opts::parse();
 
     match opts.subcmd {
-        SubCommand::Generate(g) => match run_single_testcase::<T>(&g.output, g.solution, g.seed) {
-            Ok(_) => {}
-            Err(err) => {
-                println!("{}", err);
+        SubCommand::Generate(g) => {
+            match run_singletask::<T>(&g.output, g.solution.as_ref().map(String::as_str), g.seed) {
+                Ok(_) => {}
+                Err(err) => {
+                    println!("{}", err);
+                }
             }
-        },
+        }
+        SubCommand::Grade(_) => {
+            todo!()
+        }
+    }
+}
+pub fn run_multi<T>()
+where
+    T: MultitaskTestSpec<T> + ProblemSpec<T> + MultitaskProblemSpec<T>,
+{
+    let opts: Opts = Opts::parse();
+
+    match opts.subcmd {
+        SubCommand::Generate(g) => {
+            match run_multitask::<T>(&g.output, g.solution.as_ref().map(String::as_str), g.seed) {
+                Ok(_) => {}
+                Err(err) => {
+                    println!("{}", err);
+                }
+            }
+        }
         SubCommand::Grade(_) => {
             todo!()
         }

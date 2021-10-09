@@ -1,4 +1,4 @@
-use testgen::cli::run;
+use testgen::cli::run_multi;
 use testgen::problemspec::spec::*;
 use testgen::testspec::spec::*;
 use testgen::{CONS, LINE, LS};
@@ -33,14 +33,14 @@ impl MultitaskProblemSpec<Spec> for Spec {
     fn subtask_1() -> Option<SubtaskConfig<Spec>> {
         Some(SubtaskConfig {
             score: 20,
-            constraints: |s| CONS!(s.a < 10),
+            constraints: |s| CONS!(s.a <= 10),
         })
     }
 
     fn subtask_2() -> Option<SubtaskConfig<Spec>> {
         Some(SubtaskConfig {
             score: 80,
-            constraints: |s| CONS!(s.b < 10),
+            constraints: |s| CONS!(s.b <= 10),
         })
     }
 }
@@ -71,7 +71,43 @@ impl SingletaskTestSpec<Spec> for Spec {
         ]
     }
 }
+impl MultitaskTestSpec<Spec> for Spec {
+    fn test_cases_subtask_1(random: &mut Random) -> Option<Vec<Spec>> {
+        let mut result = Vec::new();
+        for _ in 0..9 {
+            let a = random.next_range(1, 10);
+            let b = random.next_range(1, 10);
+            result.push(Spec { a, b, sum: None });
+        }
+        Some(result)
+    }
+    fn test_cases_subtask_2(random: &mut Random) -> Option<Vec<Spec>> {
+        let mut result = Vec::new();
+        for _ in 0..9 {
+            let a = random.next_range(1, 10);
+            let b = random.next_range(1, 10);
+            result.push(Spec { a, b, sum: None });
+        }
+        Some(result)
+    }
+
+    fn sample_test_cases() -> Vec<Spec> {
+        vec![
+            Spec {
+                a: 1,
+                b: 1,
+                sum: Some(2),
+            },
+            Spec {
+                a: 1,
+                b: 2,
+                sum: Some(3),
+            },
+        ]
+    }
+}
 
 fn main() {
-    run::<Spec>();
+    run_multi::<Spec>();
+    // run::<Spec>();
 }

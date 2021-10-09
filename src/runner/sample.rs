@@ -3,10 +3,10 @@ use std::path::Path;
 use crate::{
     problemspec::{
         generator::Generator,
-        spec::{ConstraintsError, ProblemSpec},
+        spec::{ConstraintsError, MultitaskProblemSpec, ProblemSpec},
     },
     runner::io::write_file,
-    testspec::spec::SingletaskTestSpec,
+    testspec::spec::{MultitaskTestSpec, SingletaskTestSpec},
 };
 use thiserror::Error;
 
@@ -17,11 +17,10 @@ pub enum GenerateSampleTestCaseError {
     #[error("IO Error")]
     IOError(#[from] std::io::Error),
 }
-pub fn generate<T>(base_folder: &Path) -> Result<(), GenerateSampleTestCaseError>
+fn _generate<T>(base_folder: &Path, specs: Vec<T>) -> Result<(), GenerateSampleTestCaseError>
 where
-    T: ProblemSpec<T> + SingletaskTestSpec<T>,
+    T: ProblemSpec<T>,
 {
-    let specs = T::sample_test_cases();
     match T::multiple_test_case_config() {
         Some(multi_test_config) => {
             let mut inputs = String::new();
@@ -74,4 +73,20 @@ where
             Ok(())
         }
     }
+}
+
+pub fn generate<T>(base_folder: &Path) -> Result<(), GenerateSampleTestCaseError>
+where
+    T: ProblemSpec<T> + SingletaskTestSpec<T>,
+{
+    let specs = T::sample_test_cases();
+    _generate(base_folder, specs)
+}
+
+pub fn generate_multitask<T>(base_folder: &Path) -> Result<(), GenerateSampleTestCaseError>
+where
+    T: ProblemSpec<T> + MultitaskProblemSpec<T> + MultitaskTestSpec<T>,
+{
+    let specs = T::sample_test_cases();
+    _generate(base_folder, specs)
 }

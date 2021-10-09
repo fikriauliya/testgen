@@ -37,7 +37,7 @@ pub struct MultipleTestcaseConfig {
 
 pub struct SubtaskConfig<T> {
     pub score: u8,
-    pub constraints: fn(T) -> Result<(), ConstraintsError>,
+    pub constraints: fn(&T) -> Result<(), ConstraintsError>,
 }
 
 pub type IOFormat = Vec<IOElement>;
