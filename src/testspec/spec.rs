@@ -16,9 +16,15 @@ where
     T: MultitaskProblemSpec<T>,
 {
     fn sample_test_cases() -> Vec<T>;
-    fn test_cases_subtask_1(random: &mut Random) -> Option<Vec<T>>;
-    fn test_cases_subtask_2(random: &mut Random) -> Option<Vec<T>>;
-    fn test_cases_subtask_3(random: &mut Random) -> Option<Vec<T>>;
+    fn test_cases_subtask_1(_random: &mut Random) -> Option<Vec<T>> {
+        None
+    }
+    fn test_cases_subtask_2(_random: &mut Random) -> Option<Vec<T>> {
+        None
+    }
+    fn test_cases_subtask_3(_random: &mut Random) -> Option<Vec<T>> {
+        None
+    }
 }
 
 pub struct Random {
