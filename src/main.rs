@@ -1,5 +1,6 @@
 use testgen::cli::run_multi;
 use testgen::problemspec::spec::*;
+use testgen::testspec::random::Random;
 use testgen::testspec::spec::*;
 use testgen::{CONS, LINE, LS};
 

@@ -6,7 +6,10 @@ use crate::{
         spec::{ConstraintsError, MultipleTestcaseConfig, MultitaskProblemSpec, ProblemSpec},
     },
     runner::{executor, io::write_file},
-    testspec::spec::{MultitaskTestSpec, Random, SingletaskTestSpec},
+    testspec::{
+        random::Random,
+        spec::{MultitaskTestSpec, SingletaskTestSpec},
+    },
 };
 use thiserror::Error;
 
