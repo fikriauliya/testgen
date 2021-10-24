@@ -1,26 +1,25 @@
 use super::problemspec::spec::*;
 use super::runner::*;
 use super::testspec::spec::*;
-use clap::{AppSettings, Clap};
+use clap::{AppSettings, Parser};
 
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(
     version = "0.1",
     author = "Pahlevi Fikri Auliya <pahlevi.fikri.auliya@gmail.com>"
 )]
-#[clap(setting = AppSettings::ColoredHelp)]
 struct Opts {
     #[clap(subcommand)]
     subcmd: SubCommand,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 enum SubCommand {
     Generate(GenerateCommand),
     Grade(GradeCommand),
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct GenerateCommand {
     #[clap(short, long, default_value = "tc")]
     output: String,
@@ -32,7 +31,7 @@ struct GenerateCommand {
     seed: u64,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct GradeCommand {
     #[clap(short, long, default_value = "tc")]
     output: String,

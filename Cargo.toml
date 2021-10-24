@@ -1,6 +1,6 @@
 [package]
 name = "testgen"
-version = "0.2.7"
+version = "0.2.8"
 authors = ["Pahlevi Fikri Auliya <pahlevi.fikri.auliya@gmail.com>"]
 edition = "2018"
 
@@ -8,6 +8,6 @@ edition = "2018"
 
 [dependencies]
 thiserror = "1.0"
-clap = "3.0.0-beta.4"
+clap = "3.0.0-beta.5"
 shlex = "1.1.0" 
 rand = "0.8.4"
