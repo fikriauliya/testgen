@@ -64,7 +64,7 @@ where
                 }
                 spec.constraints()?;
 
-                let input = spec.input_format().generate();
+                let input = spec.input_format().generate().unwrap();
                 inputs.push_str(&input);
                 if i != specs.len() - 1 {
                     inputs.push_str("\n");
@@ -105,7 +105,7 @@ where
                 } else {
                     format!("{}", i + 1)
                 };
-                let input = spec.input_format().generate();
+                let input = spec.input_format().generate().unwrap();
                 let input_path = base_folder.join(format!("{}.in", file_name));
                 write_file(&input, &input_path)?;
 

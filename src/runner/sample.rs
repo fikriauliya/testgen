@@ -40,7 +40,7 @@ where
                 println!("Sample case #{}...", i + 1);
                 spec.constraints()?;
 
-                let input = spec.input_format().generate();
+                let input = spec.input_format().generate().unwrap();
                 inputs.push_str(&input);
                 if i != specs.len() - 1 {
                     inputs.push_str("\n");
@@ -49,7 +49,7 @@ where
                 if let Some(output_prefix) = &multi_test_config.output_prefix {
                     outputs.push_str(&output_prefix.replace("{}", &(i + 1).to_string()));
                 };
-                let output = spec.output_format().generate();
+                let output = spec.output_format().generate().unwrap();
                 outputs.push_str(&output);
                 if i != specs.len() - 1 {
                     outputs.push_str("\n");
@@ -87,11 +87,11 @@ where
                 println!("Sample case #{}...", i + 1);
                 spec.constraints()?;
 
-                let input = spec.input_format().generate();
+                let input = spec.input_format().generate().unwrap();
                 let input_path = base_folder.join(format!("sample_{}.in", i + 1));
                 write_file(&input, &input_path)?;
 
-                let output = spec.output_format().generate();
+                let output = spec.output_format().generate().unwrap();
                 let output_path = base_folder.join(format!("sample_{}.out", i + 1));
 
                 if let Some(solution_command) = &solution_command {
